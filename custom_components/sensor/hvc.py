@@ -115,7 +115,6 @@ class TrashCollectionSchedule(object):
 		self.data = {}
 		for trashDay in data:
 			afvalstroomId = trashDay['afvalstroom_id']
-			pickupDate = datetime.strptime(trashDay['ophaaldatum'], '%Y-%m-%d')
-
-			if afvalstroomId not in self.data and pickupDate.date() >= datetime.now().date():
+			pickupDate = datetime.strptime(trashDay['ophaaldatum'], '%Y-%m-%d').date()
+			if afvalstroomId not in self.data and pickupDate >= datetime.now().date():
 				self.data[afvalstroomId] = pickupDate
