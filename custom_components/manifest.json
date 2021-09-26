@@ -1,0 +1,10 @@
+{
+    "domain": "hvc",
+    "name": "HVC",
+    "documentation": "https://github.com/marius1/home-assistant-custom-components",
+    "dependencies": [],
+    "codeowners": [],
+    "requirements": [],
+    "iot_class": "cloud_polling",
+    "version": "1.0.1"
+  }
