@@ -16,6 +16,9 @@ from datetime import date, datetime, timedelta
 
 _LOGGER = logging.getLogger(__name__)
 
+ATTR_TODAY = 'is_today'
+ATTR_TOMORROW = 'is_tomorrow'
+
 DEFAULT_NAME = 'hvc'
 DOMAIN = 'hvc'
 ICON = 'mdi:delete-empty'
@@ -87,6 +90,17 @@ class TrashCollectionSensor(Entity):
 	def icon(self):
 		"""Set the default sensor icon."""
 		return ICON
+	
+	@property
+	def extra_state_attributes(self):
+		"""Return the state attributes of the sensor."""
+		if self._state is None:
+			return None
+		
+		return {
+			ATTR_TODAY: self._state == datetime.now().date(),
+			ATTR_TOMORROW: self._state == (datetime.now() + timedelta(days=1)).date()
+		}
 
 	def update(self):
 		_LOGGER.debug(f"Update: {self._name}")
