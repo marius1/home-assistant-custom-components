@@ -118,17 +118,29 @@ class TrashCollectionSchedule(object):
 	@Throttle(MIN_TIME_BETWEEN_UPDATES)
 	def update(self):		
 		year = date.today().year
+		month = date.today().month
+
+		self.data = {}
+
+		_LOGGER.debug(f"Getting updates for this year.")
+		self.update_with_year(year)
+
+		""" If the month is November or December also get updates for the next year. """
+		if month >= 11:
+			_LOGGER.debug(f"Also getting updates for the next year.")
+			self.update_with_year(year+1)		
+
+	def update_with_year(self, year):
 		kalenderUrl = (f"https://apps.hvcgroep.nl/rest/adressen/{self.bagId}/kalender/{year}")
 		_LOGGER.debug(f"Getting calendar data for {self.bagId} at: {kalenderUrl}")
-		response = requests.get(kalenderUrl)
-		data = response.json()
+		response = requests.get(kalenderUrl).json()
 
-		if not data:
+		if not response:
 			_LOGGER.warning(f"Failed to get data at: {kalenderUrl}")
 		
-		self.data = {}
-		for trashDay in data:
+		for trashDay in response:
 			afvalstroomId = trashDay['afvalstroom_id']
 			pickupDate = datetime.strptime(trashDay['ophaaldatum'], '%Y-%m-%d').date()
 			if afvalstroomId not in self.data and pickupDate >= datetime.now().date():
+				_LOGGER.debug(f"Adding {afvalstroomId} with date {pickupDate}")
 				self.data[afvalstroomId] = pickupDate
