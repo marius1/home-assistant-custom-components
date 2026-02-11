@@ -24,6 +24,8 @@ DOMAIN = 'hvc'
 ICON = 'mdi:delete-empty'
 SENSOR_PREFIX = 'trash_'
 
+HVC_REST_DOMAIN = "https://inzamelkalender.hvcgroep.nl"
+
 GARBAGE_TYPES = {
 	2: 'rest',
 	3: 'papier',
@@ -46,7 +48,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
 	postalcode = config.get(CONF_POSTALCODE)
 	housenumber = config.get(CONF_HOUSENUMBER)
 
-	addressUri = (f"https://apps.hvcgroep.nl/rest/adressen/{postalcode}-{housenumber}")
+	addressUri = (f"{HVC_REST_DOMAIN}/adressen/{postalcode}:{housenumber}")
 	_LOGGER.debug(f"Searching address {postalcode}-{housenumber} at: {addressUri}")
 
 	response = requests.get(addressUri)
@@ -56,7 +58,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
 		_LOGGER.error(f"Could not find address {postalcode}-{housenumber}, check config")
 		return
 	
-	bagId = addresses[0]['bagId']
+	bagId = addresses[0]['bagid']
 
 	_LOGGER.debug(f"Found bagId {bagId}")
 
@@ -131,7 +133,7 @@ class TrashCollectionSchedule(object):
 			self.update_with_year(year+1)		
 
 	def update_with_year(self, year):
-		kalenderUrl = (f"https://apps.hvcgroep.nl/rest/adressen/{self.bagId}/kalender/{year}")
+		kalenderUrl = (f"{HVC_REST_DOMAIN}/rest/adressen/{self.bagId}/kalender/{year}")
 		_LOGGER.debug(f"Getting calendar data for {self.bagId} at: {kalenderUrl}")
 		response = requests.get(kalenderUrl).json()
 
